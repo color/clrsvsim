@@ -12,7 +12,7 @@ setup(name = "clr-sv-sim",
       author = "Color Genomics",
       author_email = "dev@color.com",
       url = "https://github.com/ColorGenomics/clr-sv-sim",
-      packages = ["clr-sv-sim"],
+      packages = ["simulator"],
       install_requires=[
         'cigar==0.1.3',
         'mock==2.0.0',
