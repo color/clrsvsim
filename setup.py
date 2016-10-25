@@ -6,13 +6,13 @@ except:
   from distutils.core import setup
 
 
-setup(name = "clr-sv-sim",
+setup(name = "clrsvsim",
       version = "0.0.1",
       description = "Color Genomics Structural Variant Simulator",
       author = "Color Genomics",
       author_email = "dev@color.com",
-      url = "https://github.com/ColorGenomics/clr-sv-sim",
-      packages = ["simulator"],
+      url = "https://github.com/ColorGenomics/clrsvsim",
+      packages = ["clrsvsim"],
       install_requires=[
         'cigar==0.1.3',
         'mock==2.0.0',
@@ -23,4 +23,4 @@ setup(name = "clr-sv-sim",
         'pysam==0.9.0',
       ],
       license = "Apache-2.0",
-      )
+)

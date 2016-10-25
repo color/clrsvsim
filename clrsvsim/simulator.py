@@ -634,7 +634,7 @@ def invert_sequence(input_bam, output_bam, chrom, start, end, inversion_ratio=0.
             if ref_name == chrom and (start <= read.reference_start < end) or (start <= read.reference_end < end):
                 reads_in_region += 1
                 if random.random() < inversion_ratio:
-                    read, bases_modified_in_read = invert_read(read, start, end, inverse_sequence, snp_rate, indel_rate, insam, max_clip_len)
+                    read, bases_modified_in_read = invert_read(read, start, end, inverse_sequence, snp_rate, indel_rate, max_clip_len)
                     if read:
                         modified_reads_in_region += 1
                         modified_bases += bases_modified_in_read
