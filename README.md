@@ -100,7 +100,7 @@ Works by randomly duplicating (or dropping) reads in a given region, including a
 
 Example result:
 
-[!Deletion](images/simulator2.png)
+![Deletion](images/simulator2.png)
 
 ## Simulated insertion
 
@@ -108,7 +108,7 @@ Given a sequence in a `fasta` file, converts reads spanning the insertion point 
 
 Example result:
 
-[!Insertion](images/simulator3.png)
+![Insertion](images/simulator3.png)
 
 ## Simulated inversion
 
@@ -118,7 +118,7 @@ After constructing the inverted sequence, the sequence and cigar of every read o
 
 Example result:
 
-[!Inversion](images/simulator4.png)
+![Inversion](images/simulator4.png)
 
 
 
