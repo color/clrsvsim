@@ -288,7 +288,7 @@ def modify_copy_number(input_bam, output_bam, chrom, start, end, ratio_change, s
         #                TACGT----------------         #               -------ACGTAC
         #                   GT---------------------    #                 -----ACGTACGTA
         sequence_for_replacement = reversed_alternate_seq if clip_left else alternate_seq
-        split_read = make_split_read(read, breakpoint, clip_left, sequence_for_replacement)
+        split_read = make_split_read(read, breakpoint, clip_left, sequence=sequence_for_replacement)
 
         # Write variants of the read.
         reads_written = 0
