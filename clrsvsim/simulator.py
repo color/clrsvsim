@@ -196,6 +196,7 @@ def modify_copy_number(input_bam, output_bam, chrom, start, end, ref_genome, rat
         chrom: Chromosome to apply modification to.
         start: Start of modification.
         end: End of modification.
+        ref_genome: The reference genome. Will be used to specify soft-clipped sequence.
         ratio_change: The fraction to increase or decrease reads. Ratios above 1.0 will result in an increase of reads in the region,
         by duplicating current reads in the region with minor modifications. Ratios below 1.0 will result in a reduction of reads in
         the region by randomly subsampling existing reads.
@@ -264,8 +265,8 @@ def modify_copy_number(input_bam, output_bam, chrom, start, end, ref_genome, rat
             The number of copies written.
         """
 
-        spans_left_breakp = (read.reference_start < start < read.reference_end)
-        spans_right_breakp = (read.reference_start < end < read.reference_end)
+        spans_left_breakp = read.reference_start < start < read.reference_end
+        spans_right_breakp = read.reference_start < end < read.reference_end
         if num_copies < 1:
             if spans_left_breakp and spans_right_breakp:
                 # pick one with more matching bp
@@ -277,7 +278,7 @@ def modify_copy_number(input_bam, output_bam, chrom, start, end, ref_genome, rat
             elif spans_right_breakp:
                 clip_left = True
             else:
-                raise ValueError('Internal Disagreement as to wether read shoud be split.')
+                raise ValueError('Internal disagreement as to whether read shoud be split.')
             if clip_left:
                 breakpoint = end - read.reference_start
             else:
