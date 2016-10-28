@@ -17,6 +17,7 @@ MIN_INSERT_LEN = 150
 CIGAR_STR_PATTERN = re.compile('^(\d+[A-Z])+$')
 CIGAR_OP_PATTERN = re.compile('(\d+)([A-Z])')
 COMPLEMENTS = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
+REF_BUF_LEN = 1000
 
 logger = logging.getLogger(__name__)
 
@@ -184,7 +185,7 @@ def modify_read(read, snp_rate, insert_rate, del_rate):
 
 
 @preconditions(lambda chrom, start, end, ratio_change: chrom and start >= 0 and end >= 0 and ratio_change >= 0 and ratio_change != 1.0)
-def modify_copy_number(input_bam, output_bam, chrom, start, end, ratio_change, snp_rate=0, indel_rate=0, split_read_ratio=1.0,
+def modify_copy_number(input_bam, output_bam, chrom, start, end, ref_genome, ratio_change, snp_rate=0, indel_rate=0, split_read_ratio=1.0,
                        random_seed=None):
     """
     Increase or decrease the amount of reads in a region; write and index a modified BAM.
@@ -211,13 +212,13 @@ def modify_copy_number(input_bam, output_bam, chrom, start, end, ratio_change, s
     Returns:
         A tuple of: (number of reads in the region, number of reads written in the region, number of split reads written)
     """
-
-    # TODO: replace random seq with actual seq taken from location of duplication/deletion.
-    random_seed = int(random_seed) if random_seed else 2016
-    random.seed(random_seed)
-    random_seq = [random_base() for _ in range(1000)]
-    alternate_seq = ''.join(random_seq)
-    reversed_alternate_seq = ''.join(reversed(random_seq))
+    fa = pyfasta.Fasta(ref_genome)
+    if ratio_change > 1:
+        right_clip_seq = str(fa[chrom][start:start + REF_BUF_LEN])
+        left_clip_seq = str(fa[chrom][end - REF_BUF_LEN:end])
+    elif ratio_change < 1:
+        left_clip_seq = str(fa[chrom][start - REF_BUF_LEN:start])
+        right_clip_seq = str(fa[chrom][end: end + REF_BUF_LEN])
 
     def write_copies(read, outsam, num_copies):
         """
@@ -263,12 +264,31 @@ def modify_copy_number(input_bam, output_bam, chrom, start, end, ratio_change, s
             The number of copies written.
         """
 
-        if read.reference_start < start < read.reference_end:
-            breakpoint = start - read.reference_start
-            clip_left = num_copies > 1  # If the copy number is increased, clipping will occur to the left of the breakpoint.
-        else:
-            breakpoint = end - read.reference_start
-            clip_left = num_copies < 1
+        spans_left_breakp = (read.reference_start < start < read.reference_end)
+        spans_right_breakp = (read.reference_start < end < read.reference_end)
+        if num_copies < 1:
+            if spans_left_breakp and spans_right_breakp:
+                # pick one with more matching bp
+                left_matching_bp = (start - read.reference_start)
+                right_matching_bp = (read.reference_end - end)
+                clip_left = left_matching_bp < right_matching_bp
+            elif spans_left_breakp:
+                clip_left = False
+            elif spans_right_breakp:
+                clip_left = True
+            else:
+                raise ValueError('Internal Disagreement as to wether read shoud be split.')
+            if clip_left:
+                breakpoint = end - read.reference_start
+            else:
+                breakpoint = start - read.reference_start
+        elif num_copies > 1:
+            if spans_left_breakp:
+                breakpoint = start - read.reference_start
+                clip_left = True
+            else:
+                breakpoint = end - read.reference_start
+                clip_left = False
 
         # If the breakpoint is beyond the read, just write the original one and bail.
         # This happens with reads that have significant gaps between matching blocks.
@@ -287,7 +307,7 @@ def modify_copy_number(input_bam, output_bam, chrom, start, end, ratio_change, s
         #             ACGTACGT----------               #           -----------ACGT
         #                TACGT----------------         #               -------ACGTAC
         #                   GT---------------------    #                 -----ACGTACGTA
-        sequence_for_replacement = reversed_alternate_seq if clip_left else alternate_seq
+        sequence_for_replacement = left_clip_seq if clip_left else right_clip_seq
         split_read = make_split_read(read, breakpoint, clip_left, sequence=sequence_for_replacement)
 
         # Write variants of the read.
@@ -298,8 +318,8 @@ def modify_copy_number(input_bam, output_bam, chrom, start, end, ratio_change, s
             reads_written = 1 + write_copies(split_read, outsam, num_copies - 1)
         else:
             # Assume heterozygous deletion - that is, a 50% chance of writing the original read rather than the split one.
-            reads_written += write_copies(read, outsam, num_copies / 2)
-            reads_written += write_copies(split_read, outsam, num_copies / 2)
+            reads_written += write_copies(read, outsam, num_copies)
+            reads_written += write_copies(split_read, outsam, 1 - num_copies)
 
         return reads_written
 
