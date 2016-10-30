@@ -142,7 +142,6 @@ def make_split_read(read, breakpoint, clip_left, hard_clip_threshold=1.0, sequen
         qual = split_read.qual
         split_read.seq = ''.join(split_seq)
         if len(qual) < len(split_seq):
-
             qual += DEFAULT_QUAL * (len(split_seq) - len(qual))
         split_read.qual = qual[:len(split_seq)]
 
