@@ -18,6 +18,7 @@ CIGAR_STR_PATTERN = re.compile('^(\d+[A-Z])+$')
 CIGAR_OP_PATTERN = re.compile('(\d+)([A-Z])')
 COMPLEMENTS = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
 REF_BUF_LEN = 1000
+DEFAULT_QUAL = ':'  # equivalent to 25
 
 logger = logging.getLogger(__name__)
 
@@ -138,7 +139,12 @@ def make_split_read(read, breakpoint, clip_left, hard_clip_threshold=1.0, sequen
             split_seq[:breakpoint] = sequence[-breakpoint:]
         else:
             split_seq[breakpoint:] = sequence[:read.rlen - breakpoint]
+        qual = split_read.qual
         split_read.seq = ''.join(split_seq)
+        if len(qual) < len(split_seq):
+
+            qual += DEFAULT_QUAL * (len(split_seq) - len(qual))
+        split_read.qual = qual[:len(split_seq)]
 
     return split_read
 
@@ -267,11 +273,11 @@ def modify_copy_number(input_bam, output_bam, chrom, start, end, ref_genome, rat
 
         spans_left_breakp = read.reference_start < start < read.reference_end
         spans_right_breakp = read.reference_start < end < read.reference_end
+        left_matching_bp = start - read.reference_start
+        right_matching_bp = read.reference_end - end
         if num_copies < 1:
             if spans_left_breakp and spans_right_breakp:
                 # pick one with more matching bp
-                left_matching_bp = (start - read.reference_start)
-                right_matching_bp = (read.reference_end - end)
                 clip_left = left_matching_bp < right_matching_bp
             elif spans_left_breakp:
                 clip_left = False
@@ -284,12 +290,18 @@ def modify_copy_number(input_bam, output_bam, chrom, start, end, ref_genome, rat
             else:
                 breakpoint = start - read.reference_start
         elif num_copies > 1:
-            if spans_left_breakp:
-                breakpoint = start - read.reference_start
+            if spans_left_breakp and spans_right_breakp:
+                clip_left = left_matching_bp < right_matching_bp
+            elif spans_left_breakp:
                 clip_left = True
+            elif spans_right_breakp:
+                clip_left = False
+            else:
+                raise ValueError('Internal disagreement as to whether read shoud be split.')
+            if clip_left:
+                breakpoint = start - read.reference_start
             else:
                 breakpoint = end - read.reference_start
-                clip_left = False
 
         # If the breakpoint is beyond the read, just write the original one and bail.
         # This happens with reads that have significant gaps between matching blocks.
