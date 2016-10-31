@@ -141,8 +141,7 @@ def make_split_read(read, breakpoint, clip_left, hard_clip_threshold=1.0, sequen
             split_seq[breakpoint:] = sequence[:read.rlen - breakpoint]
         qual = split_read.qual
         split_read.seq = ''.join(split_seq)
-        if len(qual) < len(split_seq):
-            qual += DEFAULT_QUAL * (len(split_seq) - len(qual))
+        qual += DEFAULT_QUAL * (len(split_seq) - len(qual))
         split_read.qual = qual[:len(split_seq)]
 
     return split_read
@@ -251,7 +250,7 @@ def modify_copy_number(input_bam, output_bam, chrom, start, end, ref_genome, rat
             copies_written += 1
 
         # Probabilistically write the remaining fractional part of num_copies.
-        if random.random() < num_copies:
+        if (num_copies == .5 and hash(read.qname) % 2) or random.random() < num_copies:
             outsam.write(read)
             copies_written += 1
 
@@ -283,7 +282,7 @@ def modify_copy_number(input_bam, output_bam, chrom, start, end, ref_genome, rat
             elif spans_right_breakp:
                 clip_left = True
             else:
-                raise ValueError('Internal disagreement as to whether read shoud be split.')
+                raise ValueError('Internal disagreement as to whether read should be split.')
             if clip_left:
                 breakpoint = end - read.reference_start
             else:
@@ -296,7 +295,7 @@ def modify_copy_number(input_bam, output_bam, chrom, start, end, ref_genome, rat
             elif spans_right_breakp:
                 clip_left = False
             else:
-                raise ValueError('Internal disagreement as to whether read shoud be split.')
+                raise ValueError('Internal disagreement as to whether read should be split.')
             if clip_left:
                 breakpoint = start - read.reference_start
             else:
