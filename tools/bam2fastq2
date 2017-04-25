@@ -1,0 +1,9 @@
+# Converts a paired end bam into two fastqs
+set -e
+bam=$1
+fastq1=$2
+fastq2=$3
+samtools sort -n $bam $bam.qsort
+bedtools bamtofastq -i $bam.qsort.bam -fq $fastq1 -fq2 $fastq2
+gzip $fastq1 
+gzip $fastq2

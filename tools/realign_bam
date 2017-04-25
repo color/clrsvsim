@@ -1,0 +1,14 @@
+# Takes a simulated bam file and clean up a bit at the edges and realign to genome (to get alignment right)
+
+set -e
+bam=$1
+
+python mate_dupe.py ${bam} ${bam%.bam}.mateduped.bam
+
+bam2fastq2 ${bam%.bam}.mateduped.bam fq1 fq2
+
+bwa.sh `which bwa` /resources/GRCh37.p12.fa fq1.gz fq2.gz ${bam%.bam}.realigned
+
+samtools index ${bam%.bam}.realigned.bam
+
+rm fq1.gz fq2.gz 
