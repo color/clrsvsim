@@ -250,7 +250,7 @@ def modify_copy_number(input_bam, output_bam, chrom, start, end, ref_genome, rat
             copies_written += 1
 
         # Probabilistically write the remaining fractional part of num_copies.
-        if (num_copies == .5 and hash(read.qname) % 2) or random.random() < num_copies:
+        if random.random() < num_copies:
             outsam.write(read)
             copies_written += 1
 
