@@ -42,7 +42,19 @@ Where
 ```
 Example (het duplication with no additional noise)
 ```
-modify_copy_number input.bam output.bam 7 6020605 6027346 1.5
+from clrsvsim.simulator import modify_copy_number
+
+modify_copy_number(
+  input_bam='input.bam',     # This bam needs an index such as the one created by `samtools index`
+  output_bam='output.bam',
+  chrom='7',
+  start=6020605,
+  end=6027346,
+  ref_genome='ref.fa',
+  ratio_change=1.5,
+  snp_rate=0.001,
+  indel_rate=0
+)
 ```
 
 ## Insertion
@@ -66,7 +78,17 @@ Where
 ```
 Example (insertion of an alu from the file `alu.fa`):
 ```
-insert_sequence input.bam output.bam 7 6024000 alu.fa 0.75 0.02 0 10 30 12345
+from clrsvsim.simulator import insert_sequence
+
+insert_sequence(
+  input_bam='input.bam',     # This bam needs an index such as the one created by `samtools index`
+  output_bam='output.bam',
+  chrom='7',
+  position=6024000,
+  fasta_file='alu.fa',
+  insertion_ratio=0.75,
+  random_seed=12345
+)
 ```
 
 ## Inversion
@@ -89,7 +111,18 @@ Where
 ```
 Example (inversion of a 400-base stretch):
 ```
-clr data:invert_sequence input.bam output.bam 7 6024000 6024400 0.5 0 0 30 22222
+from clrsvsim.simulator import invert_sequence
+invert_sequence(
+  input_bam='input.bam',     # This bam needs an index such as the one created by `samtools index`
+  output_bam='output.bam',
+  chrom='7',
+  start=6024000,
+  end=6024400,
+  inversion_ratio=0.5,
+  ref_genome=None,
+  snp_rate=0.001,
+  indel_rate=0
+)
 ```
 
 # Additional information
@@ -119,7 +152,3 @@ After constructing the inverted sequence, the sequence and cigar of every read o
 Example result:
 
 ![Inversion](images/simulator4.png)
-
-
-
-
