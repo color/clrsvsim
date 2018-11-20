@@ -6,7 +6,7 @@ from cigar import Cigar
 from mock import Mock
 from pyfasta import Fasta
 
-from simulator import (
+from clrsvsim.simulator import (
     make_split_read,
     modify_read,
     modify_read_for_insertion,
