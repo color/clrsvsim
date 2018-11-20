@@ -7,7 +7,7 @@ except:
 
 
 setup(name = "clrsvsim",
-      version = "0.0.1",
+      version = "0.0.2",
       description = "Color Genomics Structural Variant Simulator",
       author = "Color Genomics",
       author_email = "dev@color.com",
@@ -20,7 +20,7 @@ setup(name = "clrsvsim",
         'numpy==1.10.1',
         'preconditions==0.1',
         'pyfasta==0.5.2',
-        'pysam==0.9.0',
+        'pysam==0.10.0',
       ],
       license = "Apache-2.0",
 )
