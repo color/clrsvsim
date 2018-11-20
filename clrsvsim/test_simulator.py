@@ -25,6 +25,7 @@ class SplitReadTest(unittest.TestCase):
     def test_make_split_read(self):
         read = Mock()
         read.seq = 'A' * 20
+        read.qual = '*' * len(read.seq)
         read.rlen = len(read.seq)
         read.qname = read.query_name = 'name'
         read.reference_start = 100
@@ -90,6 +91,7 @@ class SplitReadTest(unittest.TestCase):
     def test_modify_read_for_insertion(self):
         read = Mock()
         read.seq = 'AAAAAA'
+        read.qual = '*' * len(read.seq)
         read.qname = 'test'
         read.rlen = len(read.seq)
         read.reference_start = 100
@@ -151,6 +153,7 @@ class SplitReadTest(unittest.TestCase):
     def test_invert_read(self):
         read = Mock()
         read.seq = '123456'
+        read.qual = '*' * len(read.seq)
         read.qname = 'test'
         read.rlen = len(read.seq)
         read.reference_start = 100
