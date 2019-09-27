@@ -217,6 +217,9 @@ def modify_copy_number(input_bam, output_bam, chrom, start, end, ref_genome, rat
     Returns:
         A tuple of: (number of reads in the region, number of reads written in the region, number of split reads written)
     """
+    random_seed = int(random_seed) if random_seed else 2016
+    random.seed(random_seed)
+
     fa = pyfasta.Fasta(ref_genome)
     if ratio_change > 1:
         right_clip_seq = str(fa[chrom][start:start + REF_BUF_LEN])
@@ -343,6 +346,9 @@ def modify_copy_number(input_bam, output_bam, chrom, start, end, ref_genome, rat
                 ref_name = read.reference_name
             except ValueError:
                 # Unaligned reads and other edge cases.
+                outsam.write(read)
+                continue
+            if read.reference_start is None or read.reference_end is None:
                 outsam.write(read)
                 continue
 
