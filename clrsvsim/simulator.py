@@ -380,9 +380,9 @@ def modify_read_for_insertion(read, position, sequence, snp_rate, indel_rate, pa
     clip_left = random.choice([True, False])
 
     if clip_left:
-        position -= padding / 2
+        position -= padding // 2
     else:
-        position += padding / 2
+        position += padding // 2
 
     breakpoint = position - read.reference_start
 
