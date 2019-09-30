@@ -217,8 +217,8 @@ def modify_copy_number(input_bam, output_bam, chrom, start, end, ref_genome, rat
     Returns:
         A tuple of: (number of reads in the region, number of reads written in the region, number of split reads written)
     """
-    random_seed = int(random_seed) if random_seed else 2016
-    random.seed(random_seed)
+    if random_seed:
+        random.seed(int(random_seed))
 
     fa = pyfasta.Fasta(ref_genome)
     if ratio_change > 1:
@@ -577,8 +577,8 @@ def insert_sequence(input_bam, output_bam, chrom, position, fasta_file,
     if len(sequence) < MIN_INSERT_LEN:
         raise ValueError("Min insertion size is {}; given sequence is {}".format(MIN_INSERT_LEN, len(sequence)))
 
-    random_seed = int(random_seed) if random_seed else 2016
-    random.seed(random_seed)
+    if random_seed:
+        random.seed(int(random_seed))
     unsorted = output_bam + '.unsorted'
     reads_in_region = modified_reads_in_region = modified_bases = 0
     with pysam.Samfile(input_bam, 'rb') as insam, pysam.Samfile(unsorted, mode='wb', template=insam) as outsam:
@@ -651,8 +651,8 @@ def invert_sequence(input_bam, output_bam, chrom, start, end, inversion_ratio=0.
         A tuple of: (number of reads in the region, number of reads modified in the region, number of bases modified)
     """
 
-    random_seed = int(random_seed) if random_seed else 2016
-    random.seed(random_seed)
+    if random_seed:
+        random.seed(int(random_seed))
 
     ref_genome_fa = pyfasta.Fasta(ref_genome) if ref_genome else None
     inverse_sequence = get_inverse_sequence(input_bam, chrom, start, end, ref_genome_fa)
