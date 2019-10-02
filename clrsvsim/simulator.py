@@ -189,7 +189,7 @@ def modify_read(read, snp_rate, insert_rate, del_rate):
 
 
 @preconditions(lambda chrom, start, end, ratio_change: chrom and start >= 0 and end >= 0 and ratio_change >= 0 and ratio_change != 1.0)
-def modify_copy_number(input_bam, output_bam, chrom, start, end, ref_genome, ratio_change, snp_rate=0, indel_rate=0, split_read_ratio=1.0,
+def modify_copy_number(input_bam, output_bam, chrom, start, end, ref_genome, ratio_change, snp_rate=0, indel_rate=0, split_read_ratio=0.0,
                        random_seed=None):
     """
     Increase or decrease the amount of reads in a region; write and index a modified BAM.
