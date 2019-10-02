@@ -16,6 +16,9 @@ An alternative method of simulating structural variants would be directly inject
 
 Currently supported operators are deletions, duplications, insertions, and inversions.
 
+# Limitations
+Variants are simulated by modifying individual reads, without considering the mates in paired-end sequencing. These simulations are therefore not suitable to analyze performance of algorithms relying on read pairs.
+
 # Installation 
 
 # Usage
