@@ -13,12 +13,14 @@ setup(name = "clrsvsim",
       packages = ["clrsvsim"],
       install_requires=[
         'cigar==0.1.3',
-        'mock==2.0.0',
-        'nose==1.3.7',
         'numpy==1.10.1',
         'preconditions==0.1',
         'pyfasta==0.5.2',
         'pysam==0.10.0',
+      ],
+      tests_require=[
+        'mock==2.0.0',
+        'nose==1.3.7',
       ],
       license = "Apache-2.0",
 )
