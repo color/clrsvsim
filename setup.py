@@ -8,9 +8,9 @@ setup(
     name="clrsvsim",
     version="0.1.0",
     description="Color Genomics Structural Variant Simulator",
-    author="Color Genomics",
+    author="Color",
     author_email="dev@color.com",
-    url="https://github.com/ColorGenomics/clrsvsim",
+    url="https://github.com/color/clrsvsim",
     packages=["clrsvsim"],
     install_requires=[
         "cigar>=0.1.3",
