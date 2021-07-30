@@ -1,15 +1,15 @@
 import copy
+import itertools
 import logging
 import os
 import random
 import re
 import string
+from typing import Tuple
 
-import itertools
 import pyfasta
 import pysam
 from cigar import Cigar
-from preconditions import preconditions
 
 BASES = ['A', 'C', 'G', 'T']
 PYSAM_SORT_MEM = '6G'
@@ -27,10 +27,14 @@ def complement(base):
     return COMPLEMENTS.get(base, base)
 
 
-@preconditions(lambda a, b: len(a) == len(b) == 2 and a[0] <= a[0] and b[0] <= b[1])
-def overlap(a, b):
+def overlap(a: Tuple[int, int], b: Tuple[int, int]) -> int:
+    # Will raise ValueError: too many values to unpack (expected 2) if given wrong-sized collections
+    a_start, a_end = a
+    b_start, b_end = b
+    assert (a_start <= a_end) and (b_start <= b_end)
+
     # Overlap between two integer intervals
-    return max(0, min(a[1], b[1]) - max(a[0], b[0]))
+    return max(0, min(a_end, b_end) - max(a_start, b_start))
 
 
 def get_inverse_sequence(input_bam, chrom, start, end, ref_genome_fa=None):
@@ -87,7 +91,6 @@ def _sort_index(unsorted, output_bam):
     pysam.index(output_bam)
 
 
-@preconditions(lambda read, breakpoint: read and 0 <= breakpoint < read.rlen)
 def make_split_read(read, breakpoint, clip_left, hard_clip_threshold=1.0, sequence=None):
     """
     Create a split read (a continuous soft-clip from one end of a read until a breakpoint).
@@ -108,6 +111,8 @@ def make_split_read(read, breakpoint, clip_left, hard_clip_threshold=1.0, sequen
         The split read.
 
     """
+    assert read and 0 <= breakpoint < read.rlen
+
     split_read = copy.deepcopy(read)
     split_read.qname = split_read.query_name = read.qname + '-' + 'split'
 
@@ -188,7 +193,6 @@ def modify_read(read, snp_rate, insert_rate, del_rate):
     return new_read, len(modified_bases)
 
 
-@preconditions(lambda chrom, start, end, ratio_change: chrom and start >= 0 and end >= 0 and ratio_change >= 0 and ratio_change != 1.0)
 def modify_copy_number(input_bam, output_bam, chrom, start, end, ref_genome, ratio_change, snp_rate=0, indel_rate=0, split_read_ratio=0.0,
                        random_seed=None):
     """
@@ -217,6 +221,8 @@ def modify_copy_number(input_bam, output_bam, chrom, start, end, ref_genome, rat
     Returns:
         A tuple of: (number of reads in the region, number of reads written in the region, number of split reads written)
     """
+    assert chrom and (start >= 0) and (end >= 0) and (ratio_change >= 0) and (ratio_change != 1.0)
+
     if random_seed:
         random.seed(int(random_seed))
 

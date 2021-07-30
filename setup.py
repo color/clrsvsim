@@ -6,7 +6,7 @@ except ImportError:
 
 setup(
     name="clrsvsim",
-    version="0.1.0",
+    version="0.1.1",
     description="Color Genomics Structural Variant Simulator",
     author="Color",
     author_email="dev@color.com",
@@ -15,7 +15,6 @@ setup(
     install_requires=[
         "cigar>=0.1.3",
         "numpy>=1.10.1",
-        "preconditions>=0.1",
         "pyfasta>=0.5.2",
         "pysam>=0.10.0",
     ],
