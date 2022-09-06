@@ -1,3 +1,5 @@
+**2022-09-06: clrsvsim is no longer supported or maintained. This repository is archived as read-only for reference**
+
 # clrsvsim
 Color Genomics Structural Variant Simulator
 
